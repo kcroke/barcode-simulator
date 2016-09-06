@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -18,11 +19,8 @@ namespace BarcodeSimulator
 
         private void BarcodeSimulatorControl_Load(object sender, EventArgs e)
         {
-            // setup a new Hotkey to watch for Windows+Z
-            // this could/should be configurable on the form
-            var hk = new Hotkey(Keys.Z, shift: false, control: false, alt: false, windows: true);
-            hk.Pressed += HotkeyPressed;
-            hk.Register(this);
+            // setup a new Hotkey to watch 
+            Hotkey hk = GetUnusedHotKey();
 
             // show the hotkey on the form as an FYI
             hotkeyTextBox.Text = hk.ToString();
@@ -34,6 +32,26 @@ namespace BarcodeSimulator
             ActiveControl = newStringTextBox;
 
             SetupToolTips();
+        }
+
+        private Hotkey GetUnusedHotKey()
+        {
+            // Starting at Z and going down to A, find a free hotkey and register it.
+            var zToA = EnumHelper.GetAllItems<Keys>()
+                .Where(key => key.ToString().Length == 1 && char.IsLetter(key.ToString()[0]))
+                .OrderByDescending(key => key.ToString()[0]);
+
+            Hotkey hk = new Hotkey {Windows = true};
+            foreach (var key in zToA)
+            {
+                hk.KeyCode = key;
+                if (hk.Register(this))
+                {
+                    break;
+                }
+            }
+            hk.Pressed += HotkeyPressed;
+            return hk;
         }
 
         private void SetupToolTips()
