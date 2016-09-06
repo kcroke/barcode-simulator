@@ -1,9 +1,16 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BarcodeSimulator", "BarcodeSimulator\BarcodeSimulator.csproj", "{CF8A1048-009D-4892-9BDC-94864C2A4D57}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BarcodeSimulator.Tests", "BarcodeSimulator.Tests\BarcodeSimulator.Tests.csproj", "{7513FB40-6034-4002-B434-603E57CDCF44}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{69A9DECE-3DFC-4628-99F5-252A808CD013}"
+	ProjectSection(SolutionItems) = preProject
+		rakefile.rb = rakefile.rb
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

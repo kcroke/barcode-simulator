@@ -4,7 +4,11 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Input;
+using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
+
 
 namespace BarcodeSimulator
 {
@@ -26,7 +30,7 @@ namespace BarcodeSimulator
             hotkeyTextBox.Text = hk.ToString();
 
             // list all available keys in the 'ends with' drop down
-            Enum.GetNames(typeof (Keys)).ToList().ForEach(k => endsWithComboBox.Items.Add(k));
+            Enum.GetNames(typeof(Keys)).ToList().ForEach(k => endsWithComboBox.Items.Add(k));
 
             // focus on the text box for adding new string
             ActiveControl = newStringTextBox;
@@ -65,8 +69,17 @@ namespace BarcodeSimulator
             tt.SetToolTip(itemsListView, "List of barcodes to send. Sends in order round-robin style. Select one and press Delete to remove it.");
         }
 
-        private void HotkeyPressed(object sender, HandledEventArgs e)
+        private async void HotkeyPressed(object sender, HandledEventArgs e)
         {
+            Debug.WriteLine("Hotkey pressed");
+
+            while (IsAnyKeyPressed())
+            {
+                // Made this async because sleep hogs the UI thread and the calls to check the keyboard never changed
+                // even though the key was up
+                await Task.Delay(10);
+            }
+
             if (itemsListView.Items.Count == 0)
             {
                 MessageBox.Show("You have to add some strings to the list first.", "Fail", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -84,6 +97,15 @@ namespace BarcodeSimulator
             ThreadStart starter = () => StartSending(s, (int) delayNumeric.Value, endKey);
             var t = new Thread(starter) { Name = "Sending keys " + s };
             t.Start();
+        }
+
+        private bool IsAnyKeyPressed()
+        {
+            List<Key> allPossibleKeys = EnumHelper.GetAllItems<Key>().Where(key => key != Key.None).ToList();
+            var pressedKeys = allPossibleKeys.Where(Keyboard.IsKeyDown).ToList();
+            Debug.WriteLine(string.Format("Pressed Keys: {0}", string.Join(",", pressedKeys)));
+
+            return pressedKeys.Any();
         }
 
         private static void StartSending(string text, int delay, Keys endKey = Keys.None)
